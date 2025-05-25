@@ -6,6 +6,7 @@ import { HealthModule } from './health/health.module'
 import { IS_DEV_ENV } from './libs/common/utils/is-dev.utils'
 import { PrismaModule } from './prisma/prisma.module'
 import { UserModule } from './user/user.module'
+import { ProviderModule } from './auth/provider/provider.module';
 
 @Module({
 	imports: [
@@ -16,7 +17,8 @@ import { UserModule } from './user/user.module'
 		PrismaModule,
 		AuthModule,
 		UserModule,
-		HealthModule
+		HealthModule,
+		ProviderModule
 	]
 })
 export class AppModule {}
