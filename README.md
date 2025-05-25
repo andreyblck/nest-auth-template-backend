@@ -1,98 +1,277 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS Auth Template Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+> **⚠️ Disclaimer:** This project is under active development. The functionality and documentation will be updated as the project evolves.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A production-ready NestJS authentication template with PostgreSQL, Redis, and comprehensive session management.
 
-## Description
+## ✨ Features
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- 🔐 Complete authentication system (login, register, logout) (coming soon)
+- 🍪 Session-based authentication with Redis storage (partial, coming soon)
+- 🐘 PostgreSQL database with Prisma ORM
+- 🔒 Secure cookie configuration
+- 🌐 CORS support for frontend integration
+- 🐳 Docker support for development and production
+- 📝 TypeScript support
+- 🧪 Testing setup included
+- 📊 Database migrations with Prisma
 
-## Project setup
+## 📋 Prerequisites
 
-```bash
-$ pnpm install
-```
+Before you begin, ensure you have the following installed:
 
-## Compile and run the project
+- **Node.js** (v18 or higher) - [Download](https://nodejs.org/)
+- **pnpm** (v8 or higher) - [Installation guide](https://pnpm.io/installation)
+- **Docker & Docker Compose** - [Get Docker](https://docs.docker.com/get-docker/)
+- **Git** - [Install Git](https://git-scm.com/downloads)
+
+## 🚀 Quick Start
+
+### 1. Clone and Setup
 
 ```bash
-# development
-$ pnpm run start
+# Clone the repository
+git clone <repository-url>
+cd nest-auth-template-backend
 
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+# Install dependencies
+pnpm install
 ```
 
-## Run tests
+### 2. Environment Configuration
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+# Copy environment template
+cp .env.example .env
 ```
 
-## Deployment
+**Configure your `.env` file:**
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+```env
+# Application Settings
+NODE_ENV=development
+APPLICATION_PORT=4000
+APPLICATION_URL=http://localhost:4000
+ALLOWED_ORIGIN=http://localhost:3000
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+# Session & Security
+COOKIES_SECRET=your-strong-cookies-secret-here
+SESSION_SECRET=your-strong-session-secret-here
+SESSION_NAME=session
+SESSION_DOMAIN=localhost
+SESSION_MAX_AGE=30d
+SESSION_HTTP_ONLY=true
+SESSION_SECURE=false
+SESSION_FOLDER=sessions
+
+# PostgreSQL Database
+POSTGRES_USER=root
+POSTGRES_PASSWORD=your-secure-password
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5433
+POSTGRES_DB=authorization
+POSTGRES_URI=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+
+# Redis Cache
+REDIS_USER=default
+REDIS_PASSWORD=your-redis-password
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_URI=redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+```
+
+> ⚠️ **Security Note:** Always use strong, unique secrets in production environments.
+
+### 3. Start Services
 
 ```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
+# Start PostgreSQL and Redis containers
+docker-compose up -d
+
+# Run database migrations
+pnpm prisma migrate dev
+
+# Generate Prisma client
+pnpm prisma generate
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### 4. Launch Application
 
-## Resources
+```bash
+# Development mode with hot reload
+pnpm start:dev
 
-Check out a few resources that may come in handy when working with NestJS:
+# The application will be available at http://localhost:4000
+```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+## 📝 Environment Variables Reference
 
-## Support
+### Application Configuration
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+| Variable           | Description         | Default                 | Required |
+| ------------------ | ------------------- | ----------------------- | -------- |
+| `NODE_ENV`         | Environment mode    | `development`           | ✅       |
+| `APPLICATION_PORT` | Backend server port | `4000`                  | ✅       |
+| `APPLICATION_URL`  | Backend URL         | `http://localhost:4000` | ✅       |
+| `ALLOWED_ORIGIN`   | Allowed CORS origin | `http://localhost:3000` | ✅       |
 
-## Stay in touch
+### Session & Security
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+| Variable            | Description               | Default     | Required |
+| ------------------- | ------------------------- | ----------- | -------- |
+| `COOKIES_SECRET`    | Cookie encryption secret  | -           | ✅       |
+| `SESSION_SECRET`    | Session encryption secret | -           | ✅       |
+| `SESSION_NAME`      | Session cookie name       | `session`   | ✅       |
+| `SESSION_DOMAIN`    | Session cookie domain     | `localhost` | ✅       |
+| `SESSION_MAX_AGE`   | Session expiration time   | `30d`       | ✅       |
+| `SESSION_HTTP_ONLY` | HTTP-only cookie flag     | `true`      | ✅       |
+| `SESSION_SECURE`    | Secure cookie flag        | `false`     | ✅       |
+| `SESSION_FOLDER`    | Session storage folder    | `sessions`  | ✅       |
 
-## License
+### Database Configuration
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+| Variable            | Description            | Default         | Required |
+| ------------------- | ---------------------- | --------------- | -------- |
+| `POSTGRES_USER`     | PostgreSQL username    | `root`          | ✅       |
+| `POSTGRES_PASSWORD` | PostgreSQL password    | -               | ✅       |
+| `POSTGRES_HOST`     | PostgreSQL host        | `localhost`     | ✅       |
+| `POSTGRES_PORT`     | PostgreSQL port        | `5433`          | ✅       |
+| `POSTGRES_DB`       | Database name          | `authorization` | ✅       |
+| `POSTGRES_URI`      | Full connection string | -               | ✅       |
+
+### Redis Configuration
+
+| Variable         | Description            | Default     | Required |
+| ---------------- | ---------------------- | ----------- | -------- |
+| `REDIS_USER`     | Redis username         | `default`   | ✅       |
+| `REDIS_PASSWORD` | Redis password         | -           | ✅       |
+| `REDIS_HOST`     | Redis host             | `localhost` | ✅       |
+| `REDIS_PORT`     | Redis port             | `6379`      | ✅       |
+| `REDIS_URI`      | Full connection string | -           | ✅       |
+
+## 🛠️ Available Scripts
+
+| Command           | Description                              |
+| ----------------- | ---------------------------------------- |
+| `pnpm start:dev`  | Start development server with hot reload |
+| `pnpm start:prod` | Start production server                  |
+| `pnpm build`      | Build the application for production     |
+| `pnpm test`       | Run tests                                |
+| `pnpm lint`       | Run ESLint                               |
+| `pnpm format`     | Format code with Prettier                |
+
+## 🐳 Docker Deployment
+
+### Development with Docker
+
+```bash
+# Start all services
+docker-compose up -d
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+### Production Deployment
+
+```bash
+# Build production image
+docker build -t nest-auth-backend .
+
+# Run with production compose
+docker-compose -f docker-compose.prod.yml up -d
+
+# Run database migrations
+docker-compose exec app pnpm prisma migrate deploy
+```
+
+## 🔌 API Endpoints
+
+### Authentication
+
+| Method | Endpoint         | Description                        |
+| ------ | ---------------- | ---------------------------------- |
+| `POST` | `/auth/register` | Register new user (coming soon)    |
+| `POST` | `/auth/login`    | Login user (coming soon)           |
+| `POST` | `/auth/logout`   | Logout user (coming soon)          |
+| `GET`  | `/auth/profile`  | Get user profile (coming soon)     |
+| `GET`  | `/auth/session`  | Check session status (coming soon) |
+
+### Health Check
+
+| Method | Endpoint  | Description               |
+| ------ | --------- | ------------------------- |
+| `GET`  | `/health` | Application health status |
+
+## 🔧 Troubleshooting
+
+### Common Issues
+
+**🔴 Database Connection Issues**
+
+- Ensure PostgreSQL container is running: `docker-compose ps`
+- Check database credentials in `.env`
+- Verify port 5433 is not in use: `lsof -i :5433`
+
+**🔴 Redis Connection Problems**
+
+- Verify Redis container status: `docker-compose logs redis`
+- Check Redis password configuration
+- Test Redis connection: `redis-cli -h localhost -p 6379`
+
+**🔴 Session/Cookie Issues**
+
+- Verify `SESSION_*` variables are set correctly
+- Check `SESSION_SECURE` setting (should be `false` for HTTP in development)
+- Ensure frontend and backend domains match
+
+**🔴 CORS Errors**
+
+- Check `ALLOWED_ORIGIN` matches your frontend URL exactly
+- Verify frontend is making requests to correct backend URL
+
+**🔴 Migration Issues**
+
+```bash
+# Reset database and rerun migrations
+pnpm prisma migrate reset
+pnpm prisma migrate dev
+pnpm prisma generate
+```
+
+### Debug Mode
+
+```bash
+# Start with debug logging
+DEBUG=* pnpm start:dev
+
+# Or with specific debug scope
+DEBUG=nest:* pnpm start:dev
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🆘 Support
+
+If you encounter any issues or have questions:
+
+1. Check the [Troubleshooting](#-troubleshooting) section
+2. Search existing [Issues](../../issues)
+3. Create a new [Issue](../../issues/new) with detailed information
+
+---
+
+**Happy coding! 🚀**
