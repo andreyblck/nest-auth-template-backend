@@ -11,6 +11,7 @@ A production-ready NestJS authentication template with PostgreSQL, Redis, and co
 - 🐘 PostgreSQL database with Prisma ORM
 - 🔒 Secure cookie configuration
 - ✍️ Google Recaptcha
+- 🔑 Google OAuth authentication
 - 🌐 CORS support for frontend integration
 - 🐳 Docker support for development and production
 - 📝 TypeScript support
@@ -82,6 +83,8 @@ REDIS_URI=redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
 
 # Google
 GOOGLE_RECAPTCHA_SECRET_KEY=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
 ```
 
 > ⚠️ **Security Note:** Always use strong, unique secrets in production environments.
@@ -158,6 +161,8 @@ pnpm start:dev
 | Variable                      | Description                                           | Default | Required |
 | ----------------------------- | ----------------------------------------------------- | ------- | -------- |
 | `GOOGLE_RECAPTCHA_SECRET_KEY` | Google reCAPTCHA v2/v3 secret key from Google Console | -       | ✅       |
+| `GOOGLE_CLIENT_ID`            | Google OAuth client ID                                | -       | ✅       |
+| `GOOGLE_CLIENT_SECRET`        | Google OAuth client secret                            | -       | ✅       |
 
 ## 🛠️ Available Scripts
 
@@ -202,13 +207,15 @@ docker-compose exec app pnpm prisma migrate deploy
 
 ### Authentication
 
-| Method | Endpoint         | Description                        |
-| ------ | ---------------- | ---------------------------------- |
-| `POST` | `/auth/register` | Register new user (coming soon)    |
-| `POST` | `/auth/login`    | Login user (coming soon)           |
-| `POST` | `/auth/logout`   | Logout user (coming soon)          |
-| `GET`  | `/auth/profile`  | Get user profile (coming soon)     |
-| `GET`  | `/auth/session`  | Check session status (coming soon) |
+| Method | Endpoint                         | Description                        |
+| ------ | -------------------------------- | ---------------------------------- |
+| `POST` | `/auth/register`                 | Register new user (coming soon)    |
+| `POST` | `/auth/login`                    | Login user (coming soon)           |
+| `POST` | `/auth/logout`                   | Logout user (coming soon)          |
+| `GET`  | `/auth/profile`                  | Get user profile (coming soon)     |
+| `GET`  | `/auth/session`                  | Check session status (coming soon) |
+| `GET`  | `/auth/oauth/connect/:provider`  | Initiate OAuth login               |
+| `GET`  | `/auth/oauth/callback/:provider` | OAuth callback handler             |
 
 ### Health Check
 

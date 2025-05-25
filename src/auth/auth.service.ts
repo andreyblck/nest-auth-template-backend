@@ -12,13 +12,17 @@ import { Request, Response } from 'express'
 
 import { LoginDto } from '@/auth/dto/login.dto'
 import { RegisterDto } from '@/auth/dto/register.dto'
+import { ProviderService } from '@/auth/provider/provider.service'
+import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
 
 @Injectable()
 export class AuthService {
 	public constructor(
 		private readonly userService: UserService,
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+		private readonly providerService: ProviderService,
+		private readonly db: PrismaService
 	) {}
 
 	public async register(req: Request, dto: RegisterDto) {
@@ -60,6 +64,55 @@ export class AuthService {
 		await this.saveSession(req, user)
 
 		return user
+	}
+
+	public async extractProfileFromCode(
+		req: Request,
+		provider: string,
+		code: string
+	) {
+		const providerInstance = this.providerService.findByService(provider)
+
+		const profile = await providerInstance.findUserByCode(code)
+
+		const account = await this.db.account.findFirst({
+			where: {
+				id: profile.id,
+				provider: profile.provider
+			}
+		})
+
+		let user = account?.userId
+			? await this.userService.findById(account.userId)
+			: null
+
+		if (user) {
+			return this.saveSession(req, user)
+		}
+
+		user = await this.userService.create(
+			profile.email,
+			null,
+			profile.name,
+			profile.picture,
+			AuthMethod[profile.provider.toUpperCase()] as AuthMethod,
+			true
+		)
+
+		if (!account) {
+			await this.db.account.create({
+				data: {
+					userId: user.id,
+					type: 'oauth',
+					provider: profile.provider,
+					accessToken: profile.access_token,
+					refreshToken: profile.refresh_token,
+					expiresAt: profile.expires_at
+				}
+			})
+		}
+
+		return this.saveSession(req, user)
 	}
 
 	public async logout(req: Request, res: Response): Promise<void> {
