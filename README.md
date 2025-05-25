@@ -207,15 +207,20 @@ docker-compose exec app pnpm prisma migrate deploy
 
 ### Authentication
 
-| Method | Endpoint                         | Description                        |
-| ------ | -------------------------------- | ---------------------------------- |
-| `POST` | `/auth/register`                 | Register new user (coming soon)    |
-| `POST` | `/auth/login`                    | Login user (coming soon)           |
-| `POST` | `/auth/logout`                   | Logout user (coming soon)          |
-| `GET`  | `/auth/profile`                  | Get user profile (coming soon)     |
-| `GET`  | `/auth/session`                  | Check session status (coming soon) |
-| `GET`  | `/auth/oauth/connect/:provider`  | Initiate OAuth login               |
-| `GET`  | `/auth/oauth/callback/:provider` | OAuth callback handler             |
+| Method | Endpoint                         | Description            |
+| ------ | -------------------------------- | ---------------------- |
+| `POST` | `/auth/register`                 | Register new user      |
+| `POST` | `/auth/login`                    | Login user             |
+| `POST` | `/auth/logout`                   | Logout user            |
+| `GET`  | `/auth/oauth/connect/:provider`  | Initiate OAuth login   |
+| `GET`  | `/auth/oauth/callback/:provider` | OAuth callback handler |
+
+### User
+
+| Method | Endpoint             | Description              | Role  |
+| ------ | -------------------- | ------------------------ | ----- |
+| `GET`  | `/users/profile`     | Get current user profile | Any   |
+| `GET`  | `/users/profile/:id` | Get user profile by ID   | Admin |
 
 ### Health Check
 
