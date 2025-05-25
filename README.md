@@ -10,6 +10,7 @@ A production-ready NestJS authentication template with PostgreSQL, Redis, and co
 - 🍪 Session-based authentication with Redis storage (partial, coming soon)
 - 🐘 PostgreSQL database with Prisma ORM
 - 🔒 Secure cookie configuration
+- ✍️ Google Recaptcha
 - 🌐 CORS support for frontend integration
 - 🐳 Docker support for development and production
 - 📝 TypeScript support
@@ -78,6 +79,9 @@ REDIS_PASSWORD=your-redis-password
 REDIS_HOST=localhost
 REDIS_PORT=6379
 REDIS_URI=redis://${REDIS_USER}:${REDIS_PASSWORD}@${REDIS_HOST}:${REDIS_PORT}
+
+# Google
+GOOGLE_RECAPTCHA_SECRET_KEY=
 ```
 
 > ⚠️ **Security Note:** Always use strong, unique secrets in production environments.
@@ -148,6 +152,12 @@ pnpm start:dev
 | `REDIS_HOST`     | Redis host             | `localhost` | ✅       |
 | `REDIS_PORT`     | Redis port             | `6379`      | ✅       |
 | `REDIS_URI`      | Full connection string | -           | ✅       |
+
+### Google Configuration
+
+| Variable                      | Description                                           | Default | Required |
+| ----------------------------- | ----------------------------------------------------- | ------- | -------- |
+| `GOOGLE_RECAPTCHA_SECRET_KEY` | Google reCAPTCHA v2/v3 secret key from Google Console | -       | ✅       |
 
 ## 🛠️ Available Scripts
 
