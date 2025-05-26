@@ -12,21 +12,21 @@ import { UserService } from '@/user/user.service'
 import { ProviderModule } from './provider/provider.module'
 
 @Module({
-	controllers: [AuthController],
-	providers: [AuthService, UserService],
-	imports: [
-		ProviderModule.registerAsync({
-			imports: [ConfigModule],
-			useFactory: (configService: ConfigService) =>
-				getProvidersConfig(configService),
-			inject: [ConfigService]
-		}),
-		GoogleRecaptchaModule.forRootAsync({
-			imports: [ConfigModule],
-			useFactory: (configService: ConfigService) =>
-				getRecaptchaConfig(configService),
-			inject: [ConfigService]
-		})
-	]
+  controllers: [AuthController],
+  providers: [AuthService, UserService],
+  imports: [
+    ProviderModule.registerAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) =>
+        getProvidersConfig(configService),
+      inject: [ConfigService]
+    }),
+    GoogleRecaptchaModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) =>
+        getRecaptchaConfig(configService),
+      inject: [ConfigService]
+    })
+  ]
 })
 export class AuthModule {}

@@ -3,14 +3,14 @@ import { PrismaClient } from '@prisma/__generated__'
 
 @Injectable()
 export class PrismaService
-	extends PrismaClient
-	implements OnModuleInit, OnModuleDestroy
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
 {
-	public async onModuleInit(): Promise<void> {
-		await this.$connect()
-	}
+  public async onModuleInit(): Promise<void> {
+    await this.$connect()
+  }
 
-	public async onModuleDestroy(): Promise<void> {
-		await this.$disconnect()
-	}
+  public async onModuleDestroy(): Promise<void> {
+    await this.$disconnect()
+  }
 }
