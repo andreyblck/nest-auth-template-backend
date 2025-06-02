@@ -3,6 +3,7 @@ import { AuthMethod } from '@prisma/__generated__'
 import { hash } from 'argon2'
 
 import { PrismaService } from '@/prisma/prisma.service'
+import { UserDto } from '@/user/dto/user.dto'
 
 @Injectable()
 export class UserService {
@@ -61,5 +62,20 @@ export class UserService {
     })
 
     return user
+  }
+
+  public async updateProfile(id: string, dto: UserDto) {
+    const user = await this.findById(id)
+
+    const updatedUser = await this.db.user.update({
+      where: { id: user.id },
+      data: {
+        email: dto.email,
+        displayName: dto.displayName,
+        isTwoFactorEnabled: dto.isTwoFactorEnabled
+      }
+    })
+
+    return updatedUser
   }
 }

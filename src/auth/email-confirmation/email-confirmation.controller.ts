@@ -1,4 +1,11 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Req
+} from '@nestjs/common'
 import { Request } from 'express'
 
 import { ConfirmationDto } from './dto/confirmation.dto'
@@ -12,7 +19,10 @@ export class EmailConfirmationController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
-  public async newVerification(req: Request, @Body() dto: ConfirmationDto) {
+  public async newVerification(
+    @Req() req: Request,
+    @Body() dto: ConfirmationDto
+  ) {
     return this.emailConfirmationService.newVerification(req, dto)
   }
 }

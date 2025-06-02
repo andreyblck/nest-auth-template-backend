@@ -1,6 +1,6 @@
 import {
   IsEmail,
-  IsNotEmpty,
+  IsNotEmpty, IsOptional,
   IsString,
   MaxLength,
   MinLength
@@ -20,4 +20,8 @@ export class LoginDto {
   @MaxLength(32, { message: 'Password must be less than 32 characters long' })
   @IsPasswordStrong()
   password: string
+
+  @IsOptional()
+  @IsString()
+  token: string
 }

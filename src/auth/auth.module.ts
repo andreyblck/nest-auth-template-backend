@@ -12,6 +12,8 @@ import { UserService } from '@/user/user.service'
 
 import { EmailConfirmationModule } from './email-confirmation/email-confirmation.module'
 import { ProviderModule } from './provider/provider.module'
+import { PasswordRecoveryModule } from './password-recovery/password-recovery.module';
+import { TwoFactorModule } from './two-factor/two-factor.module';
 
 @Module({
   controllers: [AuthController],
@@ -29,7 +31,9 @@ import { ProviderModule } from './provider/provider.module'
       useFactory: (configService: ConfigService) =>
         getRecaptchaConfig(configService),
       inject: [ConfigService]
-    })
+    }),
+    PasswordRecoveryModule,
+    TwoFactorModule
   ],
   exports: [AuthService]
 })

@@ -59,7 +59,7 @@ export class EmailConfirmationService {
   public async newVerification(req: Request, dto: ConfirmationDto) {
     const existingToken = await this.prisma.token.findUnique({
       where: {
-        id: dto.token,
+        token: dto.token,
         type: TokenType.VERIFICATION
       }
     })
