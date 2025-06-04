@@ -5,6 +5,7 @@ import {
   NotFoundException,
   UnauthorizedException
 } from '@nestjs/common'
+import { forwardRef, Inject } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { AuthMethod, User } from '@prisma/__generated__'
 import { verify } from 'argon2'
@@ -12,9 +13,13 @@ import { Request, Response } from 'express'
 
 import { LoginDto } from '@/auth/dto/login.dto'
 import { RegisterDto } from '@/auth/dto/register.dto'
+import { EmailConfirmationService } from '@/auth/email-confirmation/email-confirmation.service'
 import { ProviderService } from '@/auth/provider/provider.service'
+import { MailService } from '@/libs/mail/mail.service'
 import { PrismaService } from '@/prisma/prisma.service'
 import { UserService } from '@/user/user.service'
+
+import { TwoFactorService } from './two-factor/two-factor.service'
 
 @Injectable()
 export class AuthService {
@@ -22,7 +27,10 @@ export class AuthService {
     private readonly userService: UserService,
     private readonly configService: ConfigService,
     private readonly providerService: ProviderService,
-    private readonly db: PrismaService
+    private readonly db: PrismaService,
+    @Inject(forwardRef(() => EmailConfirmationService))
+    private readonly emailConfirmationService: EmailConfirmationService,
+    private readonly twoFactorService: TwoFactorService
   ) {}
 
   public async register(req: Request, dto: RegisterDto) {
@@ -43,9 +51,12 @@ export class AuthService {
       false
     )
 
-    await this.saveSession(req, newUser)
+    await this.emailConfirmationService.sendVerificationToken(newUser)
 
-    return newUser
+    return {
+      message:
+        'User created successfully. Please confirm your email. Message was sent to your email'
+    }
   }
 
   public async login(req: Request, dto: LoginDto) {
@@ -59,6 +70,27 @@ export class AuthService {
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid password')
+    }
+
+    if (!user.isVerified) {
+      throw new UnauthorizedException(
+        'Email is not verified. Please confirm your email.'
+      )
+    }
+
+    if (user.isTwoFactorEnabled) {
+      if (!dto.token) {
+        await this.twoFactorService.sendTwoFactorToken(user.email)
+
+        return {
+          message: 'Two-factor authentication required. Token sent to email.'
+        }
+      }
+
+      await this.twoFactorService.verificationTwoFactorCode(
+        user.email,
+        dto.token
+      )
     }
 
     await this.saveSession(req, user)
@@ -131,7 +163,7 @@ export class AuthService {
     })
   }
 
-  private async saveSession(req: Request, user: User) {
+  public async saveSession(req: Request, user: User) {
     return new Promise((resolve, reject) => {
       req.session.userId = user.id
 
