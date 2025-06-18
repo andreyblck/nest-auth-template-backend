@@ -9,10 +9,17 @@
 </p>
 
 <p align="center">
+  <img src="https://img.shields.io/badge/Status-Production_Ready-success?style=for-the-badge" alt="Status">
+  <img src="https://img.shields.io/badge/Auth-Session_+_OAuth-blue?style=for-the-badge" alt="Authentication">
+  <img src="https://img.shields.io/badge/2FA-Email_Based-orange?style=for-the-badge" alt="2FA">
+  <img src="https://img.shields.io/badge/API-REST_+_Swagger-green?style=for-the-badge" alt="API">
+</p>
+
+<p align="center">
   <strong>A production-ready NestJS authentication template with PostgreSQL, Redis, and comprehensive session management.</strong>
 </p>
 
-> **⚠️ Development Status:** This project is under active development. Features marked with "🚧" are coming soon.
+> **✅ Production Ready:** This template includes complete authentication, user management, 2FA, password reset, and OAuth integration.
 
 ---
 
@@ -24,7 +31,9 @@
 - [⚙️ Configuration](#️-configuration)
 - [🚀 Deployment](#-deployment)
 - [📚 API Documentation](#-api-documentation)
+- [🔒 Security Guide](#-security-guide)
 - [🛠️ Development](#️-development)
+- [🧪 Testing](#-testing)
 - [🔧 Troubleshooting](#-troubleshooting)
 - [🤝 Contributing](#-contributing)
 - [📞 Support](#-support)
@@ -35,10 +44,15 @@
 
 ### 🔐 Authentication & Security
 
-- **Session-based Authentication** with Redis storage 🚧
+- **Session-based Authentication** with Redis storage
+- **Email/Password Authentication** with secure password validation
+- **Two-Factor Authentication (2FA)** via email codes
+- **Password Reset** with secure token-based flow
+- **Email Verification** for new registrations
 - **Google OAuth** integration
 - **Google reCAPTCHA** protection
 - **Secure Cookie** configuration
+- **Role-based Authorization** (ADMIN/REGULAR)
 - **JWT Token** support (planned)
 
 ### 🗄️ Database & Storage
@@ -62,7 +76,10 @@
 - **CORS** support for frontend integration
 - **Health checks** endpoint
 - **Error handling** middleware
-- **Request validation**
+- **Request validation** with class-validator
+- **Session Security** with configurable options
+- **Password Security** with strength validation
+- **Token Security** with time-limited expiration
 - **Rate limiting** (planned)
 
 ---
@@ -269,26 +286,128 @@ docker-compose exec app pnpm prisma migrate deploy
 
 ### 🔐 Authentication Endpoints
 
-| Method | Endpoint                      | Description           | Status         |
-| ------ | ----------------------------- | --------------------- | -------------- |
-| `POST` | `/auth/register`              | Register new user     | 🚧 Coming Soon |
-| `POST` | `/auth/login`                 | Login user            | 🚧 Coming Soon |
-| `POST` | `/auth/logout`                | Logout user           | 🚧 Coming Soon |
-| `GET`  | `/auth/oauth/connect/google`  | Initiate Google OAuth | ✅ Available   |
-| `GET`  | `/auth/oauth/callback/google` | Google OAuth callback | ✅ Available   |
+| Method | Endpoint                           | Description                    | Status       |
+| ------ | ---------------------------------- | ------------------------------ | ------------ |
+| `POST` | `/auth/register`                   | Register new user              | ✅ Available |
+| `POST` | `/auth/login`                      | Login user (with 2FA support) | ✅ Available |
+| `POST` | `/auth/logout`                     | Logout user                    | ✅ Available |
+| `GET`  | `/auth/oauth/connect/:provider`    | Initiate OAuth flow            | ✅ Available |
+| `GET`  | `/auth/oauth/callback/:provider`   | OAuth callback handler         | ✅ Available |
+| `POST` | `/auth/email-confirmation`         | Verify email confirmation      | ✅ Available |
+| `POST` | `/auth/recovery`                   | Send password reset email      | ✅ Available |
+| `POST` | `/auth/recovery/confirm/:token`    | Validate recovery token        | ✅ Available |
+| `POST` | `/auth/recovery/password/:token`   | Reset password with token      | ✅ Available |
 
-### 👤 User Endpoints
+### 👤 User Management Endpoints
 
-| Method | Endpoint             | Description              | Auth Required | Role  |
-| ------ | -------------------- | ------------------------ | ------------- | ----- |
-| `GET`  | `/users/profile`     | Get current user profile | ✅            | Any   |
-| `GET`  | `/users/profile/:id` | Get user by ID           | ✅            | Admin |
+| Method | Endpoint             | Description              | Auth Required | Role    |
+| ------ | -------------------- | ------------------------ | ------------- | ------- |
+| `GET`  | `/users/profile`     | Get current user profile | ✅            | Any     |
+| `PUT`  | `/users/profile`     | Update current profile   | ✅            | Any     |
+| `GET`  | `/users/profile/:id` | Get user by ID           | ✅            | Admin   |
+| `PUT`  | `/users/profile/:id` | Update user by ID        | ✅            | Admin   |
 
 ### ❤️ Health Check
 
-| Method | Endpoint  | Description   | Response                             |
-| ------ | --------- | ------------- | ------------------------------------ |
-| `GET`  | `/health` | Health status | `{ status: 'ok', timestamp: '...' }` |
+| Method | Endpoint  | Description   | Response              |
+| ------ | --------- | ------------- | --------------------- |
+| `GET`  | `/health` | Health status | `{ status: 'ok' }`    |
+
+### 🔑 Authentication Flow Details
+
+<details>
+<summary><strong>📝 Registration Flow</strong></summary>
+
+```bash
+# 1. Register new user
+POST /auth/register
+{
+  "name": "John Doe",
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "passwordRepeat": "SecurePass123!"
+}
+
+# 2. Verify email (token sent to email)
+POST /auth/email-confirmation
+{
+  "token": "verification-token-from-email"
+}
+```
+
+</details>
+
+<details>
+<summary><strong>🔓 Login Flow</strong></summary>
+
+```bash
+# Standard login
+POST /auth/login
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!"
+}
+
+# Login with 2FA (if enabled)
+POST /auth/login
+{
+  "email": "john@example.com",
+  "password": "SecurePass123!",
+  "twoFactorToken": "123456"
+}
+```
+
+</details>
+
+<details>
+<summary><strong>🔄 Password Reset Flow</strong></summary>
+
+```bash
+# 1. Request password reset
+POST /auth/recovery
+{
+  "email": "john@example.com"
+}
+
+# 2. Validate reset token (optional)
+POST /auth/recovery/confirm/TOKEN_FROM_EMAIL
+
+# 3. Reset password
+POST /auth/recovery/password/TOKEN_FROM_EMAIL
+{
+  "password": "NewSecurePass123!",
+  "passwordRepeat": "NewSecurePass123!"
+}
+```
+
+</details>
+
+<details>
+<summary><strong>🌐 OAuth Flow</strong></summary>
+
+```bash
+# 1. Get OAuth URL
+GET /auth/oauth/connect/google
+# Returns: { "url": "https://accounts.google.com/oauth/authorize?..." }
+
+# 2. User authorizes on Google
+# 3. Google redirects to callback
+GET /auth/oauth/callback/google?code=AUTHORIZATION_CODE
+# Automatically creates/links account and redirects to frontend
+```
+
+</details>
+
+### 🛡️ Security Features
+
+- **Password Requirements**: Minimum 8 characters with complexity validation
+- **Session Management**: Redis-backed sessions with configurable expiration
+- **2FA Support**: Email-based two-factor authentication
+- **Token Security**: Time-limited tokens for email verification and password reset
+- **Role-based Access**: ADMIN and REGULAR user roles
+- **OAuth Integration**: Google OAuth 2.0 with account linking
+- **CORS Protection**: Configurable allowed origins
+- **Cookie Security**: HTTP-only, secure, and SameSite protection
 
 ### 📖 Interactive API Docs
 
@@ -296,6 +415,83 @@ When running in development, visit:
 
 - **Swagger UI**: `http://localhost:4000/api/docs`
 - **Redoc**: `http://localhost:4000/api/redoc`
+
+---
+
+## 🔒 Security Guide
+
+### 🛡️ Production Security Checklist
+
+- [ ] **Environment Variables**: All sensitive data in environment variables
+- [ ] **Strong Secrets**: Use 32+ character random strings for `COOKIES_SECRET` and `SESSION_SECRET`
+- [ ] **Database Security**: Strong database passwords and restricted access
+- [ ] **Session Configuration**: Set `SESSION_SECURE=true` and proper domain in production
+- [ ] **CORS**: Restrict `ALLOWED_ORIGIN` to your actual frontend domain
+- [ ] **Google OAuth**: Verify redirect URIs in Google Console
+- [ ] **Redis Security**: Use authentication and restrict network access
+- [ ] **SSL/TLS**: Use HTTPS in production (Let's Encrypt, Cloudflare, etc.)
+
+### 🔑 Password Policy
+
+```typescript
+// Enforced password requirements:
+- Minimum 8 characters
+- At least one uppercase letter
+- At least one lowercase letter  
+- At least one number
+- At least one special character
+```
+
+### 🚨 Security Best Practices
+
+1. **Never commit secrets** to version control
+2. **Rotate secrets regularly** in production
+3. **Monitor failed login attempts** (implement rate limiting)
+4. **Keep dependencies updated** with `pnpm audit`
+5. **Use environment-specific configurations**
+6. **Enable logging** for security events
+7. **Regular security audits** of the codebase
+
+---
+
+## 🧪 Testing
+
+### Running Tests
+
+```bash
+# Unit tests
+pnpm test
+
+# Watch mode for development
+pnpm test:watch
+
+# End-to-end tests
+pnpm test:e2e
+
+# Test coverage
+pnpm test:cov
+```
+
+### Test Categories
+
+- **Unit Tests**: Service logic, utilities, and helpers
+- **Integration Tests**: Controller endpoints and database operations
+- **E2E Tests**: Complete authentication flows and user journeys
+
+### Writing Tests
+
+```typescript
+// Example test structure
+describe('AuthController', () => {
+  it('should register a new user', async () => {
+    // Test implementation
+  });
+  
+  it('should login with valid credentials', async () => {
+    // Test implementation  
+  });
+});
+```
 
 ---
 
@@ -426,6 +622,22 @@ pnpm prisma migrate dev
 pnpm start:dev
 ```
 
+### 📊 Performance Tips
+
+```bash
+# Monitor application performance
+docker stats
+
+# Check database performance
+docker-compose exec postgres pg_stat_activity
+
+# Redis memory usage
+docker-compose exec redis redis-cli info memory
+
+# Application logs
+docker-compose logs -f app --tail=100
+```
+
 ---
 
 ## 🤝 Contributing
@@ -458,6 +670,21 @@ We welcome contributions! Here's how to get started:
 - Follow **ESLint** and **Prettier** configurations
 - Use **conventional commits** format
 - Add **JSDoc** comments for public APIs
+- Follow **NestJS best practices** and patterns
+- Use **DTOs** for request/response validation
+- Implement **proper error handling**
+
+### Commit Message Format
+
+```
+type(scope): description
+
+Types: feat, fix, docs, style, refactor, test, chore
+Examples:
+- feat(auth): add 2FA email verification
+- fix(users): resolve profile update validation
+- docs(readme): update API documentation
+```
 
 ---
 
@@ -494,12 +721,20 @@ We're always open to new ideas! Please include:
 
 ---
 
+### 💡 Feature Requests
+
+Have an idea? [Open an issue](../../issues/new) with the `enhancement` label!
+
+---
+
 <p align="center">
   <strong>Made with ❤️ by the development team</strong>
 </p>
 
 <p align="center">
-  <a href="#-table-of-contents">⬆️ Back to Top</a>
+  <a href="#-table-of-contents">⬆️ Back to Top</a> |
+  <a href="../../issues">🐛 Report Bug</a> |
+  <a href="../../issues/new">💡 Request Feature</a>
 </p>
 
 ---
